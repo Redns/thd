@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "fft.h"
+// #include "fft.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +51,7 @@
 /* USER CODE BEGIN PV */
 u8 adc_convert_done;
 u32 largestIndex = 0;
-u32 adc_buffer[ADC_BUFFER_LENGTH];
+u32 adc_buffer[1024];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -87,7 +87,7 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
   // 初始化 SIN_TABLE
-  create_sin_tab(SIN_TAB);
+  // create_sin_tab(SIN_TAB);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -113,7 +113,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH); 
+  HAL_ADC_Start_DMA(&hadc1, adc_buffer, 1024); 
   // HAL_ADC_Start(&hadc1);
   /* USER CODE END 2 */
 
@@ -143,7 +143,7 @@ int main(void)
       //   }
       // }
       // 打印数据
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
+      for(u32 i = 0; i < 1024; i++)
       {
         // printf("%d,%d\r\n", adc_buffer[i], largestIndex);
         printf("%d\r\n", adc_buffer[i]);
