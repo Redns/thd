@@ -51,6 +51,7 @@
 /* USER CODE BEGIN PV */
 u8 adc_convert_done;
 u32 adc_buffer[ADC_BUFFER_LENGTH];
+u32 adc_buffer_copy[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -124,17 +125,27 @@ int main(void)
     {
       // 清除中断标志
       adc_convert_done = 0;
+      memcpy(adc_buffer_copy, adc_buffer, sizeof(u32) * ADC_BUFFER_LENGTH);
       // 载入采样数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        Refresh_Data(Compx, i, adc_buffer[i] * 3.3f / 4096 );
+        Refresh_Data(Compx, i, adc_buffer_copy[i] * 3.3f / 4096 );
       }
       FFT(Compx);
-      Get_Result(Compx, 1000000);
+      Get_Result(Compx, 10000);
+
+      double lagest = 0;
+      u32 lagestIndex = 0;
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d\r\n", (int)(Compx[i].real));
+        // printf("%d\r\n", (int)(Compx[i].real));
+        if(Compx[i].real > lagest)
+        {
+          lagest = Compx[i].real;
+          lagestIndex = i;
+        }
       }
+      printf("[Index] %d\r\n", lagestIndex);
       // for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       // {
       //   printf("%d\r\n", (u32)(adc_buffer[i] * 1000 * 3.3 / 4096));
