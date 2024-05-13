@@ -50,8 +50,8 @@
 
 /* USER CODE BEGIN PV */
 u8 adc_convert_done;
+u32 largestIndex = 0;
 u32 adc_buffer[ADC_BUFFER_LENGTH];
-u32 adc_buffer_copy[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -126,23 +126,22 @@ int main(void)
       // 清除中断标志
       adc_convert_done = 0;
       // 载入采样数据
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
-      {
-        Refresh_Data(Compx, i, adc_buffer[i] * 3.3f / 4096);
-      }
-      // FFT 计算
-      FFT(Compx);
-      Get_Result(Compx, 1000);
-      // 获取频率
-      u32 largestIndex = 0;
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
-      {
-        // printf("%d\r\n", (int)(Compx[i].real));
-        if(Compx[i].real > Compx[largestIndex].real)
-        {
-          largestIndex = i;
-        }
-      }
+      // for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
+      // {
+      //   Refresh_Data(Compx, i, adc_buffer[i] * 3.3f / 4096);
+      // }
+      // // FFT 计算
+      // FFT(Compx);
+      // Get_Result(Compx, 1000);
+      // // 获取频率
+      // for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
+      // {
+      //   // printf("%d\r\n", (int)(Compx[i].real));
+      //   if(Compx[i].real > Compx[largestIndex].real)
+      //   {
+      //     largestIndex = i;
+      //   }
+      // }
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
