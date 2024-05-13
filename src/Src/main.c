@@ -121,16 +121,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		if(adc_convert_done)
-    {
+		// if(adc_convert_done)
+    // {
       // 清除中断标志
       adc_convert_done = 0;
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d\r\n", (int)(adc_buffer[i] * 1000 * 3.3f / 4096));
+        printf("%d\r\n", (u32)(adc_buffer[i] * 1000 * 3.3f / 4096));
       }
-    }
+    //}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
