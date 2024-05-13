@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_BUFFER_LENGTH         128
+#define ADC_BUFFER_LENGTH         FFT_N
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -129,23 +129,21 @@ int main(void)
       // 载入采样数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        Refresh_Data(Compx, i, adc_buffer_copy[i] * 3.3f / 4096 );
+        Refresh_Data(Compx, i, adc_buffer_copy[i] * 3.3f / 4096);
       }
       FFT(Compx);
       Get_Result(Compx, 10000);
 
-      double lagest = 0;
-      u32 lagestIndex = 0;
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
+      u32 largestIndex = 0;
+      for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
       {
         // printf("%d\r\n", (int)(Compx[i].real));
-        if(Compx[i].real > lagest)
+        if(Compx[i].real > Compx[largestIndex].real)
         {
-          lagest = Compx[i].real;
-          lagestIndex = i;
+          largestIndex = i;
         }
       }
-      printf("[Index] %d\r\n", lagestIndex);
+      printf("%d\r\n", largestIndex);
       // for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       // {
       //   printf("%d\r\n", (u32)(adc_buffer[i] * 1000 * 3.3 / 4096));
