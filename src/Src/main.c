@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_BUFFER_LENGTH         FFT_N
+#define ADC_BUFFER_LENGTH         2048
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,7 +51,7 @@
 /* USER CODE BEGIN PV */
 u8 adc_convert_done;
 u32 largestIndex = 0;
-u32 adc_buffer[1024];
+u32 adc_buffer[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,7 +113,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start_DMA(&hadc1, adc_buffer, 1024); 
+  HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH); 
   // HAL_ADC_Start(&hadc1);
   /* USER CODE END 2 */
 
@@ -125,28 +125,10 @@ int main(void)
     {
       // 清除中断标志
       adc_convert_done = 0;
-      // 载入采样数据
-      // for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
-      // {
-      //   Refresh_Data(Compx, i, adc_buffer[i] * 3.3f / 4096);
-      // }
-      // // FFT 计算
-      // FFT(Compx);
-      // Get_Result(Compx, 1000);
-      // // 获取频率
-      // for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
-      // {
-      //   // printf("%d\r\n", (int)(Compx[i].real));
-      //   if(Compx[i].real > Compx[largestIndex].real)
-      //   {
-      //     largestIndex = i;
-      //   }
-      // }
       // 打印数据
-      for(u32 i = 0; i < 1024; i++)
+      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        // printf("%d,%d\r\n", adc_buffer[i], largestIndex);
-        printf("%d\r\n", adc_buffer[i]);
+        printf("%d\r\n", (int)(adc_buffer[i] * 3.3 / 4096));
       }
     }
     /* USER CODE END WHILE */
