@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_BUFFER_LENGTH         2048
+#define ADC_BUFFER_LENGTH         1024
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -128,7 +128,7 @@ int main(void)
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d\r\n", (int)(adc_buffer[i] * 1000 * 3.3 / 4096));
+        printf("%d\r\n", (int)(adc_buffer[i] * 1000 * 3.3f / 4096));
       }
     }
     /* USER CODE END WHILE */
