@@ -129,9 +129,9 @@ int main(void)
       // 复制数据
       memcpy(adc_buffer_copy, adc_buffer, sizeof(u32) * ADC_BUFFER_LENGTH);
       // 打印数据
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
+      for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
       {
-        printf("%d\r\n", (int)(adc_buffer_copy[i] * 1000 * 3.3f / 4096));
+        printf("%d,%d\r\n", (int)(adc_buffer_copy[i] * 1000 * 3.3f / 4096), (int)(adc_buffer_copy[i+1] * 1000 * 3.3f / 4096));
       }
     }
     /* USER CODE END WHILE */
