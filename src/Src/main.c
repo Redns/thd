@@ -131,7 +131,7 @@ int main(void)
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d\r\n", (u32)(adc_buffer_copy[i] * 1000 * 3.3f / 4096));
+        printf("%d\r\n", (int)(adc_buffer_copy[i] * 1000 * 3.3f / 4096));
       }
     }
     /* USER CODE END WHILE */
