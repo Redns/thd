@@ -125,15 +125,15 @@ int main(void)
     {
       // 清除中断标志
       adc_convert_done = 0;
-      memcpy(adc_buffer_copy, adc_buffer, sizeof(u32) * ADC_BUFFER_LENGTH);
       // 载入采样数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        Refresh_Data(Compx, i, adc_buffer_copy[i] * 3.3f / 4096);
+        Refresh_Data(Compx, i, adc_buffer[i] * 3.3f / 4096);
       }
+      // FFT 计算
       FFT(Compx);
-      Get_Result(Compx, 10000);
-
+      Get_Result(Compx, 1000);
+      // 获取频率
       u32 largestIndex = 0;
       for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
       {
@@ -143,11 +143,11 @@ int main(void)
           largestIndex = i;
         }
       }
-      printf("%d\r\n", largestIndex);
-      // for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
-      // {
-      //   printf("%d\r\n", (u32)(adc_buffer[i] * 1000 * 3.3 / 4096));
-      // }
+      // 打印数据
+      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
+      {
+        printf("%d,%d\r\n", adc_buffer[i], largestIndex);
+      }
     }
     /* USER CODE END WHILE */
 

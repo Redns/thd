@@ -1,7 +1,7 @@
 #ifndef __FFT_H__
 #define __FFT_H__
 
-#define FFT_N 256                                      //定义傅里叶变换的点数
+#define FFT_N 128                                      //定义傅里叶变换的点数
 #define PI 3.14159265358979323846264338327950288419717  //定义圆周率值
 
 struct compx { double real, imag; };                    //定义一个复数结构
