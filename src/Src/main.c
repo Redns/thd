@@ -52,6 +52,7 @@
 u8 adc_convert_done;
 u32 largestIndex = 0;
 u32 adc_buffer[ADC_BUFFER_LENGTH];
+u32 adc_buffer_copy[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,16 +122,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		// if(adc_convert_done)
-    // {
+		if(adc_convert_done)
+    {
       // 清除中断标志
       adc_convert_done = 0;
+      // 复制数据
+      memcpy(adc_buffer_copy, adc_buffer, sizeof(u32) * ADC_BUFFER_LENGTH);
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d\r\n", (u32)(adc_buffer[i] * 1000 * 3.3f / 4096));
+        printf("%d\r\n", (u32)(adc_buffer_copy[i] * 1000 * 3.3f / 4096));
       }
-    //}
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
