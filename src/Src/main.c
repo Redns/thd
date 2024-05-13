@@ -145,7 +145,8 @@ int main(void)
       // 打印数据
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d,%d\r\n", adc_buffer[i], largestIndex);
+        // printf("%d,%d\r\n", adc_buffer[i], largestIndex);
+        printf("%d\r\n", adc_buffer[i]);
       }
     }
     /* USER CODE END WHILE */
