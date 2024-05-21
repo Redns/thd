@@ -2,5 +2,9 @@
 *.o
 *.map
 *.lst
+*.workspace
 
 .vscode
+
+sim/Project Backups
+src/thd.stm32/build
