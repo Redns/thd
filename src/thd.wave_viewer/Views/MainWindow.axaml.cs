@@ -16,6 +16,7 @@ public partial class MainWindow : Window
         if(avaPlot1 != null)
         {
             avaPlot1.Plot.Add.Scatter(dataX, dataY);
+            avaPlot1.Plot.Title("Hello");
             avaPlot1.Refresh();
         }
     }

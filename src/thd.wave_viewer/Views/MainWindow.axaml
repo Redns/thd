@@ -18,14 +18,6 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid Background="Gainsboro" 
-      HorizontalAlignment="Left" 
-      VerticalAlignment="Top" 
-      ColumnDefinitions="100,*"
-      RowDefinitions="100,*">
-      <Button Grid.Row="0" Grid.Column="0">Click</Button>
-      <ScottPlot:AvaPlot Name="AvaPlot1" Grid.Row="0" Grid.Column="1" />
-      <!-- <ScottPlot:AvaPlot Name="AvaPlot2" Grid.Row="1" Grid.Column="1" /> -->
-    </Grid>
+    <ScottPlot:AvaPlot Name="AvaPlot1" />
 
 </Window>
