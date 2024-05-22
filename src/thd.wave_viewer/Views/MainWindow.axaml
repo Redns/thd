@@ -7,7 +7,6 @@
         mc:Ignorable="d" Width="800" Height="600"
         x:Class="WaveViewer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        WindowStartupLocation="CenterOwner" ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
         Icon="/Assets/avalonia-logo.ico"
         Title="WaveViewer">
 
@@ -24,7 +23,7 @@
         <TextBlock Grid.Row="2" Text="数据流控" />
         <TextBlock Grid.Row="3" Text="校验位" />
         <TextBlock Grid.Row="4" Text="数据位数" />
-        <TextBlock Grid.Row="0" Text="停止位数" />
+        <TextBlock Grid.Row="5" Text="停止位数" />
       </Grid>
       <!-- <Grid Grid.Column="1" RowDefinitions="*, *">
         <ScottPlot:AvaPlot Grid.Row="0" Name="AvaPlot1" />

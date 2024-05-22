@@ -24,7 +24,7 @@ public partial class MainWindow : Window
         
         avaPlot1.Plot.Add.Signal(siginal);
         avaPlot1.Plot.Benchmark.IsVisible = true;
-        avaPlot1.Plot.Title("波形", 30);
+        avaPlot1.Plot.Title("Wave", 30);
         avaPlot1.Plot.Axes.Title.IsVisible = true;
         avaPlot1.Refresh();
     }
