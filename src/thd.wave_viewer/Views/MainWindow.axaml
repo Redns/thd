@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WaveViewer.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="WaveViewer.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner" ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="WaveViewer">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Background="Gainsboro" 
+      HorizontalAlignment="Left" 
+      VerticalAlignment="Top" 
+      ColumnDefinitions="100,*"
+      RowDefinitions="100,*">
+      <Button Grid.Row="0" Grid.Column="0">Click</Button>
+      <ScottPlot:AvaPlot Name="AvaPlot1" Grid.Row="0" Grid.Column="1" />
+      <!-- <ScottPlot:AvaPlot Name="AvaPlot2" Grid.Row="1" Grid.Column="1" /> -->
+    </Grid>
+
+</Window>

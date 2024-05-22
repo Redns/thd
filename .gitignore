@@ -8,3 +8,5 @@
 
 sim/Project Backups
 src/thd.stm32/build
+src/thd.wave_viewer/bin
+src/thd.wave_viewer/obj
