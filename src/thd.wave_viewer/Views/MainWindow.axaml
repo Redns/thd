@@ -4,10 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        mc:Ignorable="d" Width="800" Height="600"
         x:Class="WaveViewer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        CanResize="False"
         WindowStartupLocation="CenterOwner" ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
         Icon="/Assets/avalonia-logo.ico"
         Title="WaveViewer">
@@ -18,14 +17,20 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid Background="Gainsboro" 
-      HorizontalAlignment="Left" 
-      VerticalAlignment="Top" 
-      ColumnDefinitions="100,*"
-      RowDefinitions="100,*">
-      <Button Grid.Row="0" Grid.Column="0">Click</Button>
-      <ScottPlot:AvaPlot Name="AvaPlot1" Grid.Row="0" Grid.Column="1" />
-      <!-- <ScottPlot:AvaPlot Name="AvaPlot2" Grid.Row="1" Grid.Column="1" /> -->
+    <Grid ColumnDefinitions="330, *">
+      <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, *" ColumnDefinitions="*, *">
+        <TextBlock Grid.Row="0" Text="端口号" />
+        <TextBlock Grid.Row="1" Text="波特率" />
+        <TextBlock Grid.Row="2" Text="数据流控" />
+        <TextBlock Grid.Row="3" Text="校验位" />
+        <TextBlock Grid.Row="4" Text="数据位数" />
+        <TextBlock Grid.Row="0" Text="停止位数" />
+      </Grid>
+      <!-- <Grid Grid.Column="1" RowDefinitions="*, *">
+        <ScottPlot:AvaPlot Grid.Row="0" Name="AvaPlot1" />
+        <ScottPlot:AvaPlot Grid.Row="1" Name="AvaPlot2" />
+      </Grid> -->
+      <ScottPlot:AvaPlot Grid.Column="1" Name="AvaPlot1" />
     </Grid>
 
 </Window>
