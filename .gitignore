@@ -6,7 +6,13 @@
 
 .vscode
 
+# Proteus
 sim/Project Backups
+
+# STM32
 src/thd.stm32/build
-src/thd.wave_viewer/bin
-src/thd.wave_viewer/obj
+
+# WaveViewer
+src/thd.wave_viewer/.vs
+src/thd.wave_viewer/WaveViewer/bin
+src/thd.wave_viewer/WaveViewer/obj

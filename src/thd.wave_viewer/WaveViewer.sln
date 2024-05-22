@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.002.0
+VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaveViewer", "WaveViewer.csproj", "{63057EB4-219C-4D3C-AA77-7487BD5CFFDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaveViewer", "WaveViewer\WaveViewer.csproj", "{7473FEAE-6069-43F0-8DBF-C60811381BFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,17 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{63057EB4-219C-4D3C-AA77-7487BD5CFFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63057EB4-219C-4D3C-AA77-7487BD5CFFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63057EB4-219C-4D3C-AA77-7487BD5CFFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63057EB4-219C-4D3C-AA77-7487BD5CFFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7473FEAE-6069-43F0-8DBF-C60811381BFB}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FC968947-ABBC-49AD-98CB-1A19AFB1ECEF}
+		SolutionGuid = {753B5EDD-A3C9-4F6D-A176-82FE60CA58A7}
 	EndGlobalSection
 EndGlobal
