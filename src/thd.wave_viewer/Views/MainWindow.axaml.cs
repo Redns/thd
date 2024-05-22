@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using ScottPlot.Avalonia;
 
@@ -9,15 +10,22 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        double[] dataX = { 1, 2, 3, 4, 5 };
-        double[] dataY = { 1, 4, 9, 16, 25 };
+        double[] siginal = new double[102400];
+        for(int i = 0; i < 102400; i++)
+        {
+            siginal[i] = Math.Sin(i * 2 * Math.PI / 10240.0) + 0.5 * Math.Sin(i * 4 * Math.PI / 10240.0) + 0.25 * Math.Sin(i * 6 * Math.PI / 10240.0);
+        }
 
         var avaPlot1 = this.Find<AvaPlot>("AvaPlot1");
-        if(avaPlot1 != null)
+        if(avaPlot1 == null)
         {
-            avaPlot1.Plot.Add.Scatter(dataX, dataY);
-            avaPlot1.Plot.Title("Hello");
-            avaPlot1.Refresh();
+            return;    
         }
+        
+        avaPlot1.Plot.Add.Signal(siginal);
+        avaPlot1.Plot.Benchmark.IsVisible = true;
+        avaPlot1.Plot.Title("波形", 30);
+        avaPlot1.Plot.Axes.Title.IsVisible = true;
+        avaPlot1.Refresh();
     }
 }
