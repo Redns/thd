@@ -1,32 +1,101 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<MudStack Row Spacing="0" Class="d-flex mud-width-full mud-height-full">
+    <MudStack Spacing="4" Class="pa-5" Style="width: 380px">
+        <MudSelect T="string" Label="端口号" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AdfScanner">
+            <MudSelectItem Value="@("Cardinale")" />
+            <MudSelectItem Value="@("Diavolo")" />
+            <MudSelectItem Value="@("Margarita")" />
+            <MudSelectItem Value="@("Spinaci")" />
+        </MudSelect>
+        <MudTextField @bind-Value="Amount" Label="波特率" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Wifi" />
+        <MudSelect T="string" Label="数据流控" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Water">
+            <MudSelectItem Value="@("None")" />
+            <MudSelectItem Value="@("Hard")" />
+            <MudSelectItem Value="@("Soft")" />
+        </MudSelect>
+        <MudSelect T="string" Label="校验位" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Lock">
+            <MudSelectItem Value="@("None")" />
+            <MudSelectItem Value="@("Even")" />
+            <MudSelectItem Value="@("Odd")" />
+            <MudSelectItem Value="@("Space")" />
+            <MudSelectItem Value="@("Mark")" />
+        </MudSelect>
+        <MudSelect T="string" Label="数据位数" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.ElectricBolt">
+            <MudSelectItem Value="@("8")" />
+            <MudSelectItem Value="@("7")" />
+            <MudSelectItem Value="@("6")" />
+            <MudSelectItem Value="@("5")" />
+        </MudSelect>
+        <MudSelect T="string" Label="停止位数" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AcUnit">
+            <MudSelectItem Value="@("1")" />
+            <MudSelectItem Value="@("1.5")" />
+            <MudSelectItem Value="@("2")" />
+        </MudSelect>
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.InsertLink">连 接</MudButton>
+    </MudStack>
+    <MudStack Class="d-flex justify-start mud-width-full mud-height-full pa-5">
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Height="100%" Style="height: 50%; width: 100%;"></MudChart>
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Height="100%" Style="height: 50%; width: 100%;"></MudChart>
+    </MudStack>
+</MudStack>
 
-Welcome to your new app.
-
-<MudButton>Click</MudButton>
-<MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary">Disable elevation</MudButton>
-
-<div>
-    <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options" />
-    <MudGrid>
-        <MudItem xs="6">
-            <MudText Typo="Typo.body1" Class="py-3">Selected: @(Index < 0 ? "None" : Series[Index].Name)</MudText>
-        </MudItem>
-        <MudItem xs="6">
-            <MudSlider @bind-Value="Options.LineStrokeWidth" Min="1" Max="10" Color="Color.Info">Line Width: @Options.LineStrokeWidth.ToString()</MudSlider>
-        </MudItem>
-    </MudGrid>
-</div>
 @code {
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-    public ChartOptions Options = new ChartOptions();
+    public double? Amount { get; set; }
+    Pizza pizza = new Pizza { Name = "Diavolo" };
 
+    public class Pizza
+    {
+        public string Name { get; set; }
+
+        // Note: this is important so the select can compare pizzas
+        public override bool Equals(object o) {
+            var other = o as Pizza;
+            return other?.Name==Name;
+        }
+
+        // Note: this is important so the select can compare pizzas
+        public override int GetHashCode() => Name.GetHashCode();
+    }
+
+    Func<Pizza,string> converter = p => p?.Name;
+
+    private ChartOptions options = new ChartOptions();
     public List<ChartSeries> Series = new List<ChartSeries>()
     {
-        new ChartSeries() { Name = "Fossil", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
-        new ChartSeries() { Name = "Renewable", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148 } },
+        new ChartSeries() { Name = "Series 1", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
+        new ChartSeries() { Name = "Series 2", Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148 } },
     };
     public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+    Random random = new Random();
+    protected override void OnInitialized()
+    {
+        options.InterpolationOption = InterpolationOption.NaturalSpline;
+        options.YAxisFormat = "c2";
+    }
+
+    public void RandomizeData()
+    {
+        var new_series = new List<ChartSeries>()
+        {
+            new ChartSeries() { Name = "Series 1", Data = new double[9] },
+            new ChartSeries() { Name = "Series 2", Data = new double[9] },
+        };
+        for (int i = 0; i < 9; i++)
+        {
+            new_series[0].Data[i] = random.NextDouble() * 100;
+            new_series[1].Data[i] = random.NextDouble() * 100;
+        }
+        Series = new_series;
+        StateHasChanged();
+    }
+
+    void OnClickMenu(InterpolationOption interpolationOption)
+    {
+        options.InterpolationOption = interpolationOption;
+        StateHasChanged();
+    }
+
 
 }
