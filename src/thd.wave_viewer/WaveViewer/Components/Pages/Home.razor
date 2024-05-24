@@ -1,12 +1,21 @@
 ﻿@page "/"
 
+@inject ISnackbar Snackbar
+
 <MudStack Row Spacing="0" Class="d-flex mud-width-full mud-height-full">
     <MudStack Spacing="4" Class="pa-5" Style="width: 380px">
-        <MudSelect T="string" Label="端口号" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AdfScanner">
-            <MudSelectItem Value="@("Cardinale")" />
-            <MudSelectItem Value="@("Diavolo")" />
-            <MudSelectItem Value="@("Margarita")" />
-            <MudSelectItem Value="@("Spinaci")" />
+        <MudSelect T="string" Label="端口号" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AdfScanner" OnOpen="RefreshSerialPorts">
+            @if(_serialPorts?.Length > 0)
+            {
+                foreach (var port in _serialPorts)
+                {
+                    <MudSelectItem Value="@port" />
+                }
+            }
+            else
+            {
+                <MudSelectItem Value="@("No serial port avaliable")" />
+            }
         </MudSelect>
         <MudTextField @bind-Value="Amount" Label="波特率" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Wifi" />
         <MudSelect T="string" Label="数据流控" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Water">
@@ -34,31 +43,19 @@
         </MudSelect>
         <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.InsertLink">连 接</MudButton>
     </MudStack>
-    <MudStack Class="d-flex justify-start mud-width-full mud-height-full pa-5">
-        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Height="100%" Style="height: 50%; width: 100%;"></MudChart>
-        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Height="100%" Style="height: 50%; width: 100%;"></MudChart>
+    <MudStack Class="mud-width-full mud-height-full pa-5">
+        <MudStack Row Spacing="10" Class="justify-center mud-width-full">
+            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Style="width: 50%;"></MudChart>
+            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Style="width: 50%;"></MudChart>
+        </MudStack>
+        <MudGrid Style="width: 100%; height: 50%;">
+
+        </MudGrid>
     </MudStack>
 </MudStack>
 
 @code {
     public double? Amount { get; set; }
-    Pizza pizza = new Pizza { Name = "Diavolo" };
-
-    public class Pizza
-    {
-        public string Name { get; set; }
-
-        // Note: this is important so the select can compare pizzas
-        public override bool Equals(object o) {
-            var other = o as Pizza;
-            return other?.Name==Name;
-        }
-
-        // Note: this is important so the select can compare pizzas
-        public override int GetHashCode() => Name.GetHashCode();
-    }
-
-    Func<Pizza,string> converter = p => p?.Name;
 
     private ChartOptions options = new ChartOptions();
     public List<ChartSeries> Series = new List<ChartSeries>()
