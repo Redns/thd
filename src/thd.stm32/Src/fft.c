@@ -1,5 +1,6 @@
 #include "fft.h"
 
+static double HANNING_WINDOW[FFT_N];
 static double FFT_SIN_TABLE[FFT_SIN_TABLE_LENGTH];
 
 /**
@@ -68,6 +69,12 @@ static double fft_cos(double dec)
  */
 void fft_init()
 {
+	/* 初始化汉宁窗 */
+	for(int i = 0; i < FFT_N; i++)
+	{
+		HANNING_WINDOW[i] = 0.5 + 0.5 * cos(2 * PI * i / (FFT_N - 1));
+	}
+
 	/* 初始化正弦表 */
 	for(int i = 0; i < FFT_SIN_TABLE_LENGTH; i++)
 	{
@@ -84,6 +91,12 @@ double fft_calculate(complex_t *signal, double sample_freq)
 {
 	register int f, m, nv2, nm1, i, k, l, j = 0;
 	complex_t u, w, t;
+
+	// 加窗
+	for(int i = 0; i < FFT_N; i++)
+	{
+		signal->real *= HANNING_WINDOW[i];
+	}
 
 	nv2 = FFT_N / 2;					//变址运算，即把自然顺序变成倒位序，采用雷德算法
 	nm1 = FFT_N - 1;
@@ -133,10 +146,10 @@ double fft_calculate(complex_t *signal, double sample_freq)
 		}
 	}
 
-	double max_index = 0, max_value = 0;
-	for (int i = 0; i < FFT_N / 2; ++i)
+	double max_index = 1, max_value = 0;
+	for (int i = 1; i < FFT_N / 2; ++i)
 	{          
-		signal[i].real = sqrt(signal[i].real*signal[i].real + signal[i].imag*signal[i].imag) / (FFT_N >> (i != 0));
+		signal[i].real = sqrt(signal[i].real*signal[i].real + signal[i].imag*signal[i].imag);
 		signal[i].imag = i * sample_freq / FFT_N;
 
 		if(signal[i].real > max_value)

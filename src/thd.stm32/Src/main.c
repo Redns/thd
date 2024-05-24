@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_SAMPLE_FREQ           100000000
+#define ADC_SAMPLE_FREQ           857142
 #define ADC_BUFFER_LENGTH         FFT_N
 /* USER CODE END PD */
 
@@ -52,13 +52,9 @@
 
 /* USER CODE BEGIN PV */
 u8 adc_convert_done;
-u32 largestIndex = 0;
-u32 adc_buffer[ADC_BUFFER_LENGTH];
-u32 adc_buffer_copy[ADC_BUFFER_LENGTH];
-
 double signal_freq;
 complex_t fft_calc_buffer[FFT_N];
-
+u32 adc_buffer[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,7 +77,8 @@ PUTCHAR_PROTOTYPE
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-    adc_convert_done = 1;
+    adc_convert_done = 1; 
+    HAL_ADC_Stop_DMA(hadc);
 }
 /* USER CODE END 0 */
 
@@ -132,25 +129,25 @@ int main(void)
     {
       // 清除中断标志
       adc_convert_done = 0;
-      // 复制数据
-      memcpy(adc_buffer_copy, adc_buffer, sizeof(u32) * ADC_BUFFER_LENGTH);
+      // ADC 电压转换
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        adc_buffer_copy[i] = (adc_buffer_copy[i] * 3300) >> 12;
+        adc_buffer[i] = (adc_buffer[i] * 3300) >> 12;
       }
       // FFT 计算
       for(u32 i = 0; i < FFT_N; i++)
       {
-          fft_calc_buffer[i].real = adc_buffer_copy[i];
+          fft_calc_buffer[i].real = adc_buffer[i];
           fft_calc_buffer[i].imag = 0;
       }
       signal_freq = fft_calculate(fft_calc_buffer, ADC_SAMPLE_FREQ);
       // 发送数据至上位机
-      for(u32 i = 0; i < ADC_BUFFER_LENGTH / 2; i++)
+      printf("FREQ:%d\r\n", (int)signal_freq);
+      for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        // printf("%d,%d\r\n", (int)signal_freq, (int)adc_buffer_copy[i]);
-        printf("%d\r\n", (int)signal_freq);
+        printf("%d,%d\r\n", (int)adc_buffer[i], (i > ADC_BUFFER_LENGTH / 2 - 1) ? 0 : (int)(fabs(fft_calc_buffer[i].real)));
       }
+      HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH); 
     }
     /* USER CODE END WHILE */
 

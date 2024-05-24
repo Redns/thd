@@ -50,7 +50,7 @@ namespace WaveViewer.Components.Pages
 		/// <summary>
 		/// 波特率
 		/// </summary>
-		private int _baudrate = 115200;
+		private int _baudrate = 9600;
 		public int Baudrate
 		{
 			get
@@ -86,32 +86,9 @@ namespace WaveViewer.Components.Pages
         public StopBits StopBits { get; set; } = StopBits.One;
 
         /// <summary>
-        /// 采样频率
-        /// </summary>
-        private int _sampleFrequency = 1000;
-        public int SampleFrequency
-        {
-            get
-            {
-                return _sampleFrequency;
-            }
-
-            set
-            {
-                if(value < SAMPLE_FREQUENCY_MIN)
-                {
-                    _sampleFrequency = SAMPLE_FREQUENCY_MIN;
-                    _snackbar.Add($"采样频率不能低于 {SAMPLE_FREQUENCY_MIN} Hz !", Severity.Error);
-                    return;
-                }
-                _sampleFrequency = value;
-            }
-        }
-
-        /// <summary>
         /// FFT 计算点数
         /// </summary>
-        private int _fftCalculateSize = 32;
+        private int _fftCalculateSize = 512;
         public int FFTCalculateSize
         {
             get
@@ -136,10 +113,10 @@ namespace WaveViewer.Components.Pages
                 }
 
                 _fftCalculateSize = value;
+                _waveData = new double[_fftCalculateSize];
+                _specData = new double[_fftCalculateSize >> 1];
 
                 // 更新坐标轴
-                _waveData.Clear();
-                _specData.Clear();
                 _waveXLabels.Clear();
                 _specXLabels.Clear();
                 _waveChartSeries.Clear();
@@ -152,38 +129,24 @@ namespace WaveViewer.Components.Pages
         /// <summary>
         /// 波形数据
         /// </summary>
-        private readonly List<double> _waveData = [];
+        private double[]? _waveData;
         public double[] WaveData
         {
             get
             {
-                if(_waveData.Count == 0)
-                {
-					for (int i = 0; i < FFTCalculateSize; i++)
-					{
-						_waveData.Add(10 * Math.Sin(2 * Math.PI * i / FFT_CALCULATE_MIN_SIZE));
-					}
-                }
-                return [.. _waveData];
+                return _waveData ??= new double[FFTCalculateSize];
             }
         }
 
         /// <summary>
         /// 频谱数据
         /// </summary>
-        private readonly List<double> _specData = [];
+        private double[]? _specData;
         public double[] SpecData
         {
             get
             {
-                if(_specData.Count == 0)
-                {
-					for (int i = 0; i < FFTCalculateSize; i++)
-					{
-						_specData.Add((i % (FFTCalculateSize >> 3) == 0) ? Math.Abs(i - FFTCalculateSize / 2) : 0);
-					}
-				}
-                return [.. _specData];
+                return _specData ??= new double[FFTCalculateSize >> 1];
             }
         }
 
@@ -195,14 +158,15 @@ namespace WaveViewer.Components.Pages
         {
             get
             {
-                if(_waveChartSeries.Count == 0)
+                if((_waveChartSeries.Count == 0))
                 {
-					_waveChartSeries.Add(new ChartSeries
-					{
-						Name = "Wave",
-						Data = WaveData
-					});
-				}
+                    _waveChartSeries.Add(new ChartSeries
+                    {
+                        Name = "Wave",
+                        Data = WaveData
+                    });
+
+                }
 
                 return _waveChartSeries;
             }
@@ -251,7 +215,7 @@ namespace WaveViewer.Components.Pages
         /// <summary>
         /// 频谱图横坐标
         /// </summary>
-        private List<string> _specXLabels = [];
+        private readonly List<string> _specXLabels = [];
         public string[] SpecXLabels
         {
             get
@@ -266,6 +230,26 @@ namespace WaveViewer.Components.Pages
                 return [.. _specXLabels];
             }
         }
+
+        /// <summary>
+        /// 接收数据包数量
+        /// </summary>
+        public int PacketCount { get; set; } = 0;
+
+        /// <summary>
+        /// 峰峰值
+        /// </summary>
+        public int Vpp {  get; set; } = 0;
+
+        /// <summary>
+        /// 信号频率
+        /// </summary>
+        public int SignalFrequency {  get; set; }
+
+        /// <summary>
+        /// 数据包有效标志
+        /// </summary>
+        public bool IsPackageValid { get; set; }
 
         /// <summary>
         /// 串口是否连接
@@ -294,6 +278,9 @@ namespace WaveViewer.Components.Pages
             }
         }
 
+        /// <summary>
+        /// 串口启动按钮图标
+        /// </summary>
         public string SerialPortLaunchButtonIcon
         {
             get
@@ -302,6 +289,9 @@ namespace WaveViewer.Components.Pages
             }
         }
 
+        /// <summary>
+        /// 串口启动
+        /// </summary>
         public void OnLaunchSerialPort()
         {
             // 关闭串口
@@ -334,6 +324,7 @@ namespace WaveViewer.Components.Pages
                 DataBits = DataBits,
                 StopBits = StopBits
             };
+            SerialPort.DataReceived += SerialPort_DataReceived;
             SerialPort.Open();
 #else
             _snackbar.Add("该系统暂不支持打开串口！", Severity.Warning);
@@ -341,6 +332,86 @@ namespace WaveViewer.Components.Pages
 #endif
             IsSerialPortConnected = true;
             _snackbar.Add("串口已打开！", Severity.Success);
+        }
+
+        /// <summary>
+        /// 串口接收中断回调函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+#if WINDOWS
+                // 接收串口数据
+                var packet = SerialPort?.ReadLine();
+                if (!IsPackageValid && (packet?.Split(':').First() == "FREQ"))
+                {
+                    PacketCount = 0;
+                    IsPackageValid = true;
+                    SignalFrequency = int.Parse(packet.Split(':')[1]);
+                    await InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+
+                    return;
+                }
+
+                // 解析数据包
+                var data = packet?.Split(',');
+                if(data?.Length == 2)
+                {
+                    // 解析数据包
+                    WaveData[PacketCount] = Math.Abs(double.Parse(data[0]));
+                    if(PacketCount < SpecData.Length)
+                    {
+                        SpecData[PacketCount] = Math.Abs(double.Parse(data[1]));
+                    }
+                    PacketCount++;
+
+                    // 更新波形
+                    await InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+                }
+#endif
+        
+                if(PacketCount == FFTCalculateSize)
+                {
+                    // 计算峰峰值
+                    Vpp = (int)(WaveData.Max() - WaveData.Min());
+
+                    // 清除波形
+                    IsPackageValid = false;
+                    Array.Fill(WaveData, 0);
+                    Array.Fill(SpecData, 0);
+
+                    // 更新波形
+                    await InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+                }
+            }
+            catch
+            {
+                // 清除波形
+                IsPackageValid = false;
+                Array.Fill(WaveData, 0);
+                Array.Fill(SpecData, 0);
+
+                Vpp = 0;
+                SignalFrequency = 0;
+
+                // 更新波形
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+            }
         }
 
         /// <summary>

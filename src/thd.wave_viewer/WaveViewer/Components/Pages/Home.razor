@@ -32,7 +32,6 @@
             <MudSelectItem Value="StopBits.OnePointFive">1.5</MudSelectItem>
             <MudSelectItem Value="StopBits.Two">2</MudSelectItem>
         </MudSelect>
-        <MudNumericField @bind-Value="SampleFrequency" Label="采样频率" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.QueryBuilder" />
         <MudNumericField @bind-Value="FFTCalculateSize" Label="FFT 点数" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Workspaces" />
         <MudButton Variant="Variant.Outlined" OnClick="OnLaunchSerialPort" Color="SerialPortLaunchButtonColor" StartIcon="@SerialPortLaunchButtonIcon">@SerialPortLaunchButtonText</MudButton>
     </MudStack>
@@ -42,27 +41,12 @@
             <MudText Typo="Typo.h6" Style="width: 50%;" Align="Align.Center">Spectrum</MudText>
         </MudStack>
         <MudStack Row Spacing="0" Class="justify-center mud-width-full">
-            <MudChart ChartType="ChartType.Line" ChartSeries="@WaveCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
-            <MudChart ChartType="ChartType.Line" ChartSeries="@SpecCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
+            <MudChart ChartType="ChartType.Line" ChartSeries="@WaveCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, MaxNumYAxisTicks = 3, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
+            <MudChart ChartType="ChartType.Line" ChartSeries="@SpecCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, MaxNumYAxisTicks = 3, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
         </MudStack>
-        <MudGrid Spacing="2">
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">频率:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">10 KHz</MudText></MudItem>
-
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">最大值:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">1.3</MudText></MudItem>
-
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">THD:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">37.5%</MudText></MudItem>
-
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">最小值:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">0.2</MudText></MudItem>
-
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">直流偏移:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">2.5</MudText></MudItem>
-
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">峰峰值:</MudText></MudItem>
-            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">1.0</MudText></MudItem>
+        <MudGrid Spacing="0">
+            <MudItem xs="6"><MudText Typo="Typo.body1" Align="Align.Center">VPP - @Vpp mV</MudText></MudItem>
+            <MudItem xs="6"><MudText Typo="Typo.body1" Align="Align.Center">FREQ - @SignalFrequency Hz</MudText></MudItem>
         </MudGrid>
     </MudStack>
 </MudStack>

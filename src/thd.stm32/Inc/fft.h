@@ -3,7 +3,7 @@
 
 #include "math.h"
 
-#define FFT_N                       512       
+#define FFT_N                       512    
 #define FFT_SIN_TABLE_LENGTH        (FFT_N / 4 + 1)        
 
 #define PI                          3.1415926535
