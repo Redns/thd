@@ -1,98 +1,80 @@
 ﻿@page "/"
 
-@inject ISnackbar Snackbar
+@using System.IO.Ports
 
-<MudStack Row Spacing="0" Class="d-flex mud-width-full mud-height-full">
-    <MudStack Spacing="4" Class="pa-5" Style="width: 380px">
-        <MudSelect T="string" Label="端口号" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AdfScanner" OnOpen="RefreshSerialPorts">
-            @if(_serialPorts?.Length > 0)
+@inject ISnackbar _snackbar
+
+<MudStack Row Spacing="0" Class="mud-width-full mud-height-full">
+    <MudStack Spacing="4" Class="pa-5" Style="width: 380px;">
+        <MudSelect Label="端口号" T="string" @bind-Value="SerialPortName" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AdfScanner">
+            @foreach (var port in SerialPorts)
             {
-                foreach (var port in _serialPorts)
-                {
-                    <MudSelectItem Value="@port" />
-                }
+                <MudSelectItem Value="@port" />
             }
-            else
-            {
-                <MudSelectItem Value="@("No serial port avaliable")" />
-            }
+        </MudSelect> 
+        <MudNumericField Label="波特率" @bind-Value="Baudrate" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Wifi" />
+		<MudSelect Label="校验位" T="Parity" @bind-Value="Parity" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Lock">
+            <MudSelectItem Value="Parity.None" />
+            <MudSelectItem Value="Parity.Even" />
+            <MudSelectItem Value="Parity.Odd" />
+            <MudSelectItem Value="Parity.Space" />
+            <MudSelectItem Value="Parity.Mark" />
         </MudSelect>
-        <MudTextField @bind-Value="Amount" Label="波特率" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Wifi" />
-        <MudSelect T="string" Label="数据流控" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Water">
-            <MudSelectItem Value="@("None")" />
-            <MudSelectItem Value="@("Hard")" />
-            <MudSelectItem Value="@("Soft")" />
+		<MudSelect Label="数据位数" T="int" @bind-Value="DataBits" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.ElectricBolt">
+            <MudSelectItem Value="8" />
+            <MudSelectItem Value="7" />
+            <MudSelectItem Value="6" />
+            <MudSelectItem Value="5" />
         </MudSelect>
-        <MudSelect T="string" Label="校验位" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Lock">
-            <MudSelectItem Value="@("None")" />
-            <MudSelectItem Value="@("Even")" />
-            <MudSelectItem Value="@("Odd")" />
-            <MudSelectItem Value="@("Space")" />
-            <MudSelectItem Value="@("Mark")" />
+		<MudSelect Label="停止位数" T="StopBits" @bind-Value="StopBits" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AcUnit">
+            <MudSelectItem Value="StopBits.None">None</MudSelectItem>
+            <MudSelectItem Value="StopBits.One">1</MudSelectItem>
+            <MudSelectItem Value="StopBits.OnePointFive">1.5</MudSelectItem>
+            <MudSelectItem Value="StopBits.Two">2</MudSelectItem>
         </MudSelect>
-        <MudSelect T="string" Label="数据位数" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.ElectricBolt">
-            <MudSelectItem Value="@("8")" />
-            <MudSelectItem Value="@("7")" />
-            <MudSelectItem Value="@("6")" />
-            <MudSelectItem Value="@("5")" />
-        </MudSelect>
-        <MudSelect T="string" Label="停止位数" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.AcUnit">
-            <MudSelectItem Value="@("1")" />
-            <MudSelectItem Value="@("1.5")" />
-            <MudSelectItem Value="@("2")" />
-        </MudSelect>
-        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.InsertLink">连 接</MudButton>
+        <MudNumericField @bind-Value="SampleFrequency" Label="采样频率" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.QueryBuilder" />
+        <MudNumericField @bind-Value="FFTCalculateSize" Label="FFT 点数" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Workspaces" />
+        <MudButton Variant="Variant.Outlined" OnClick="OnLaunchSerialPort" Color="SerialPortLaunchButtonColor" StartIcon="@SerialPortLaunchButtonIcon">@SerialPortLaunchButtonText</MudButton>
     </MudStack>
-    <MudStack Class="mud-width-full mud-height-full pa-5">
-        <MudStack Row Spacing="10" Class="justify-center mud-width-full">
-            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Style="width: 50%;"></MudChart>
-            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" ChartOptions="options" Width="100%" Style="width: 50%;"></MudChart>
+    <MudStack Spacing="0" Class="mud-width-full mud-height-full pa-5">
+        <MudStack Row Class="justify-center">
+            <MudText Typo="Typo.h6" Style="width: 50%;" Align="Align.Center">Wave</MudText>
+            <MudText Typo="Typo.h6" Style="width: 50%;" Align="Align.Center">Spectrum</MudText>
         </MudStack>
-        <MudGrid Style="width: 100%; height: 50%;">
+        <MudStack Row Spacing="0" Class="justify-center mud-width-full">
+            <MudChart ChartType="ChartType.Line" ChartSeries="@WaveCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
+            <MudChart ChartType="ChartType.Line" ChartSeries="@SpecCharSeries" ChartOptions="@(new ChartOptions { DisableLegend = true, InterpolationOption = InterpolationOption.Straight })" Width="100%" Style="width: 50%; aspect-ratio: 5 / 3;"></MudChart>
+        </MudStack>
+        <MudGrid Spacing="2">
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">频率:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">10 KHz</MudText></MudItem>
 
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">最大值:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">1.3</MudText></MudItem>
+
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">THD:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">37.5%</MudText></MudItem>
+
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">最小值:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">0.2</MudText></MudItem>
+
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">直流偏移:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">2.5</MudText></MudItem>
+
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Right">峰峰值:</MudText></MudItem>
+            <MudItem xs="3"><MudText Typo="Typo.body1" Align="Align.Left">1.0</MudText></MudItem>
         </MudGrid>
     </MudStack>
 </MudStack>
 
-@code {
-    public double? Amount { get; set; }
-
-    private ChartOptions options = new ChartOptions();
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Series 1", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
-        new ChartSeries() { Name = "Series 2", Data = new double[] { 35, 41, 35, 51, 49, 62, 69, 91, 148 } },
-    };
-    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
-
-    Random random = new Random();
-    protected override void OnInitialized()
-    {
-        options.InterpolationOption = InterpolationOption.NaturalSpline;
-        options.YAxisFormat = "c2";
+<style>
+    .mud-charts-gridlines-xaxis-lines > path {
+        stroke: none;
+        stroke-width: 0;
     }
 
-    public void RandomizeData()
-    {
-        var new_series = new List<ChartSeries>()
-        {
-            new ChartSeries() { Name = "Series 1", Data = new double[9] },
-            new ChartSeries() { Name = "Series 2", Data = new double[9] },
-        };
-        for (int i = 0; i < 9; i++)
-        {
-            new_series[0].Data[i] = random.NextDouble() * 100;
-            new_series[1].Data[i] = random.NextDouble() * 100;
-        }
-        Series = new_series;
-        StateHasChanged();
+    .mud-charts-gridlines-yaxis > path:first-of-type {
+        stroke: #e8e8e8;
+        stroke-width: 3px;
     }
-
-    void OnClickMenu(InterpolationOption interpolationOption)
-    {
-        options.InterpolationOption = interpolationOption;
-        StateHasChanged();
-    }
-
-
-}
+</style>
