@@ -50,7 +50,7 @@ namespace WaveViewer.Components.Pages
 		/// <summary>
 		/// 波特率
 		/// </summary>
-		private int _baudrate = 9600;
+		private int _baudrate = 115200;
 		public int Baudrate
 		{
 			get
@@ -232,6 +232,11 @@ namespace WaveViewer.Components.Pages
         }
 
         /// <summary>
+        /// 显示模式
+        /// </summary>
+        public DisplayMode DisplayMode { get; set; }
+
+        /// <summary>
         /// 接收数据包数量
         /// </summary>
         public int PacketCount { get; set; } = 0;
@@ -343,7 +348,6 @@ namespace WaveViewer.Components.Pages
         {
             try
             {
-#if WINDOWS
                 // 接收串口数据
                 var packet = SerialPort?.ReadLine();
                 if (!IsPackageValid && (packet?.Split(':').First() == "FREQ"))
@@ -351,11 +355,18 @@ namespace WaveViewer.Components.Pages
                     PacketCount = 0;
                     IsPackageValid = true;
                     SignalFrequency = int.Parse(packet.Split(':')[1]);
-                    await InvokeAsync(() =>
-                    {
-                        StateHasChanged();
-                    });
 
+                    // 清除波形
+                    Array.Fill(WaveData, 0);
+                    Array.Fill(SpecData, 0);
+
+                    if(DisplayMode == DisplayMode.Increase)
+                    {
+                        await InvokeAsync(() =>
+                        {
+                            StateHasChanged();
+                        });
+                    }
                     return;
                 }
 
@@ -363,34 +374,29 @@ namespace WaveViewer.Components.Pages
                 var data = packet?.Split(',');
                 if(data?.Length == 2)
                 {
-                    // 解析数据包
-                    WaveData[PacketCount] = Math.Abs(double.Parse(data[0]));
-                    if(PacketCount < SpecData.Length)
+                    WaveData[PacketCount] = double.Parse(data[0]);
+                    if (PacketCount < SpecData.Length)
                     {
-                        SpecData[PacketCount] = Math.Abs(double.Parse(data[1]));
+                        SpecData[PacketCount] = double.Parse(data[1]);
                     }
                     PacketCount++;
 
-                    // 更新波形
-                    await InvokeAsync(() =>
+                    if(DisplayMode == DisplayMode.Increase)
                     {
-                        StateHasChanged();
-                    });
+                        // 更新波形
+                        await InvokeAsync(() =>
+                        {
+                            StateHasChanged();
+                        });
+                    }
                 }
-#endif
-        
-                if(PacketCount == FFTCalculateSize)
+
+                if (PacketCount == FFTCalculateSize)
                 {
-                    // 计算峰峰值
+                    IsPackageValid = false;
                     Vpp = (int)(WaveData.Max() - WaveData.Min());
 
-                    // 清除波形
-                    IsPackageValid = false;
-                    Array.Fill(WaveData, 0);
-                    Array.Fill(SpecData, 0);
-
-                    // 更新波形
-                    await InvokeAsync(() =>
+                    await InvokeAsync(() => 
                     {
                         StateHasChanged();
                     });
@@ -398,19 +404,7 @@ namespace WaveViewer.Components.Pages
             }
             catch
             {
-                // 清除波形
                 IsPackageValid = false;
-                Array.Fill(WaveData, 0);
-                Array.Fill(SpecData, 0);
-
-                Vpp = 0;
-                SignalFrequency = 0;
-
-                // 更新波形
-                await InvokeAsync(() =>
-                {
-                    StateHasChanged();
-                });
             }
         }
 
@@ -423,5 +417,11 @@ namespace WaveViewer.Components.Pages
         {
             return (x - (1 << (int)Math.Log2(x))) == 0;
         }
+    }
+
+    public enum DisplayMode
+    {
+        None = 0,
+        Increase
     }
 }

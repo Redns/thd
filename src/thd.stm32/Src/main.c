@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_SAMPLE_FREQ           857142
+#define ADC_SAMPLE_FREQ           (12000000 / (12.5 + 1.5))
 #define ADC_BUFFER_LENGTH         FFT_N
 /* USER CODE END PD */
 
@@ -51,10 +51,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-u8 adc_convert_done;
 double signal_freq;
 complex_t fft_calc_buffer[FFT_N];
-u32 adc_buffer[ADC_BUFFER_LENGTH];
+
+u8  adc_convert_done;
+u32 adc_buffer_rd_index;
+u32 adc_buffer_wr_index;
+u32 adc_buffer[2][ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,6 +95,9 @@ int main(void)
   /* USER CODE BEGIN 1 */
   // 初始化 SIN_TABLE
   fft_init();
+  // 初始胡 ADC 读写缓冲区指针
+  adc_buffer_wr_index = 0;
+  adc_buffer_rd_index = 1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -117,8 +123,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH); 
-  // HAL_ADC_Start(&hadc1);
+  HAL_ADC_Start_DMA(&hadc1, adc_buffer[adc_buffer_wr_index], ADC_BUFFER_LENGTH); 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -129,15 +134,19 @@ int main(void)
     {
       // 清除中断标志
       adc_convert_done = 0;
+      // 启动 DMA
+      adc_buffer_wr_index = adc_buffer_wr_index ? 0 : 1;
+      adc_buffer_rd_index = adc_buffer_rd_index ? 0 : 1;
+      HAL_ADC_Start_DMA(&hadc1, adc_buffer[adc_buffer_wr_index], ADC_BUFFER_LENGTH); 
       // ADC 电压转换
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        adc_buffer[i] = (adc_buffer[i] * 3300) >> 12;
+        adc_buffer[adc_buffer_rd_index][i] = (adc_buffer[adc_buffer_rd_index][i] * 3300) >> 12;
       }
       // FFT 计算
       for(u32 i = 0; i < FFT_N; i++)
       {
-          fft_calc_buffer[i].real = adc_buffer[i];
+          fft_calc_buffer[i].real = adc_buffer[adc_buffer_rd_index][i];
           fft_calc_buffer[i].imag = 0;
       }
       signal_freq = fft_calculate(fft_calc_buffer, ADC_SAMPLE_FREQ);
@@ -145,9 +154,8 @@ int main(void)
       printf("FREQ:%d\r\n", (int)signal_freq);
       for(u32 i = 0; i < ADC_BUFFER_LENGTH; i++)
       {
-        printf("%d,%d\r\n", (int)adc_buffer[i], (i > ADC_BUFFER_LENGTH / 2 - 1) ? 0 : (int)(fabs(fft_calc_buffer[i].real)));
+        printf("%d,%d\r\n", (int)adc_buffer[adc_buffer_rd_index][i], (i > ADC_BUFFER_LENGTH / 2 - 1) ? 0 : (int)(fabs(fft_calc_buffer[i].real)));
       }
-      HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH); 
     }
     /* USER CODE END WHILE */
 

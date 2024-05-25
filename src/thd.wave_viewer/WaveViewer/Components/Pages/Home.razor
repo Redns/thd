@@ -20,7 +20,7 @@
             <MudSelectItem Value="Parity.Space" />
             <MudSelectItem Value="Parity.Mark" />
         </MudSelect>
-		<MudSelect Label="数据位数" T="int" @bind-Value="DataBits" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.ElectricBolt">
+        <MudSelect Label="数据位数" T="int" @bind-Value="DataBits" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Equalizer">
             <MudSelectItem Value="8" />
             <MudSelectItem Value="7" />
             <MudSelectItem Value="6" />
@@ -33,6 +33,10 @@
             <MudSelectItem Value="StopBits.Two">2</MudSelectItem>
         </MudSelect>
         <MudNumericField @bind-Value="FFTCalculateSize" Label="FFT 点数" HideSpinButtons Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Workspaces" />
+        <MudSelect Label="显示模式" T="DisplayMode" @bind-Value="DisplayMode" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.ElectricBolt">
+            <MudSelectItem Value="DisplayMode.None">静态显示</MudSelectItem>
+            <MudSelectItem Value="DisplayMode.Increase">逐点加载</MudSelectItem>
+        </MudSelect>
         <MudButton Variant="Variant.Outlined" OnClick="OnLaunchSerialPort" Color="SerialPortLaunchButtonColor" StartIcon="@SerialPortLaunchButtonIcon">@SerialPortLaunchButtonText</MudButton>
     </MudStack>
     <MudStack Spacing="0" Class="mud-width-full mud-height-full pa-5">
